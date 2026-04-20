@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -20,12 +21,18 @@ public class Course {
     private UUID id;
 
     private String title;
+    @Column(columnDefinition = "TEXT")
     private String description;
     private Double price;
+    @Column(name = "image_url")
+    private String imageUrl;
+    private String difficulty; // Beginner, Intermediate, Advanced
+    @Column(name = "created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Setter
     @ManyToOne
     @JoinColumn(name = "tutor_id")
     private Profile tutor;
+
 
 }

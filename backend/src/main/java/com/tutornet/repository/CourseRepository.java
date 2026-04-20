@@ -6,6 +6,5 @@ import java.util.UUID;
 import java.util.List;
 
 public interface CourseRepository extends JpaRepository<Course, UUID> {
-    // This allows us to find all courses belonging to a specific tutor
     List<Course> findByTutorId(UUID tutorId);
 }
