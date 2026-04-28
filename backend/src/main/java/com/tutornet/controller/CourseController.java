@@ -1,10 +1,9 @@
 package com.tutornet.controller;
 
-import com.tutornet.model.Course;
-import com.tutornet.model.Enrollment;
-import com.tutornet.model.Lesson;
-import com.tutornet.model.Profile;
+import com.tutornet.model.*;
+import com.tutornet.repository.AnnouncementRepository;
 import com.tutornet.repository.CourseRepository;
+import com.tutornet.repository.EnrollmentRepository;
 import com.tutornet.repository.LessonRepository;
 import com.tutornet.service.EnrollmentService;
 import com.tutornet.service.LessonProgressService;
@@ -30,6 +29,12 @@ public class CourseController {
 
     @Autowired
     private LessonRepository lessonRepository;
+
+    @Autowired
+    private AnnouncementRepository announcementRepository;
+
+    @Autowired
+    private EnrollmentRepository enrollmentRepository;
 
     @Autowired
     private ProfileService profileService;
@@ -121,5 +126,42 @@ public class CourseController {
     public List<Enrollment> getMyEnrollments(@AuthenticationPrincipal Jwt jwt) {
         UUID learnerId = UUID.fromString(jwt.getSubject());
         return enrollmentService.getLearnerEnrollments(learnerId);
+    }
+
+    /**
+     * Tutors can post a new announcement to a course they own.
+     */
+    @PostMapping("/{courseId}/announcements")
+    @PreAuthorize("hasRole('TUTOR')")
+    public Announcement createAnnouncement(
+            @PathVariable UUID courseId,
+            @RequestBody Announcement announcement,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not found"));
+
+        // Security: Ensure only the owner can post
+        UUID currentTutorId = UUID.fromString(jwt.getSubject());
+        if (!course.getTutor().getId().equals(currentTutorId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the course tutor can post announcements.");
+        }
+
+        announcement.setCourse(course);
+        return announcementRepository.save(announcement);
+    }
+
+    /**
+     * Learners can view the announcements for a course.
+     */
+    @GetMapping("/{courseId}/announcements")
+    public List<Announcement> getAnnouncements(@PathVariable UUID courseId, @AuthenticationPrincipal Jwt jwt) {
+        // Gatekeeper: Ensure the learner is enrolled (using the logic we built earlier)
+        UUID userId = UUID.fromString(jwt.getSubject());
+        if (!enrollmentRepository.existsByLearnerIdAndCourseId(userId, courseId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Enrollment required to view announcements.");
+        }
+
+        return announcementRepository.findByCourseIdOrderByCreatedAtDesc(courseId);
     }
 }
