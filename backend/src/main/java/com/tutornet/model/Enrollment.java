@@ -27,11 +27,6 @@ public class Enrollment {
     @JoinColumn(name = "course_id")
     private Course course;
 
-    @Column(name = "progress_percent")
-    private Integer progressPercent = 0;
-
     @Column(name = "enrolled_at")
     private LocalDateTime enrolledAt = LocalDateTime.now();
-    @Column(name = "completed_at")
-    private LocalDateTime completedAt;
 }

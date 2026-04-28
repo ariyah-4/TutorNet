@@ -1,5 +1,7 @@
 package com.tutornet.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,6 +34,7 @@ public class Course {
 
     @ManyToOne
     @JoinColumn(name = "tutor_id")
+    @JsonIgnoreProperties({"courses", "email", "updatedAt"})
     private Profile tutor;
 
 

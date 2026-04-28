@@ -8,7 +8,6 @@ import com.tutornet.repository.EnrollmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,25 +39,11 @@ public class EnrollmentService {
         Enrollment enrollment = new Enrollment();
         enrollment.setLearner(learner);
         enrollment.setCourse(course);
-        enrollment.setProgressPercent(0);
 
         return enrollmentRepository.save(enrollment);
     }
 
     public List<Enrollment> getLearnerEnrollments(UUID learnerId) {
         return enrollmentRepository.findByLearnerId(learnerId);
-    }
-
-    public Enrollment updateProgress(Long enrollmentId, Integer newProgress) {
-        Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
-                .orElseThrow(() -> new RuntimeException("Enrollment not found"));
-
-        enrollment.setProgressPercent(newProgress);
-
-        if (newProgress >= 100) {
-            enrollment.setCompletedAt(LocalDateTime.now());
-        }
-
-        return enrollmentRepository.save(enrollment);
     }
 }
