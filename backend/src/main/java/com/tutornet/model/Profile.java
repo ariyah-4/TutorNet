@@ -31,7 +31,4 @@ public class Profile {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    public String getFullName() {
-        return firstName + " " + lastName;
-    }
 }
