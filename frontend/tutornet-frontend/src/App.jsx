@@ -1,4 +1,8 @@
+import { useEffect } from 'react'
+import { supabase } from './supabaseClient'
+
 import { Routes, Route } from "react-router-dom";
+
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import TutorDashboardPage from "./pages/TutorDashboardPage";
@@ -22,6 +26,20 @@ function App() {
 <Route path="/student/courses" element={<AllCoursesPage />} />
     </Routes>
   );
+
+  useEffect(() => {
+  async function connect() {
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: 'tutor@gmail.com',
+      password: 'Arya#4444'
+    })
+
+    console.log(data, error)
+  }
+
+  connect()
+}, [])
 }
 
 export default App;
