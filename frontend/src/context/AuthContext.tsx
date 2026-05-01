@@ -1,14 +1,16 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import type {User} from '@supabase/supabase-js';
+import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabaseClient';
 import { api } from '../services/api';
-import type {Profile} from '../types';
+import type { Profile } from '../types';
 
 interface AuthContextType {
     user: User | null;
     profile: Profile | null;
     loading: boolean;
     signOut: () => Promise<void>;
+    // Added setProfile to the interface to allow global state updates
+    setProfile: (profile: Profile | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -26,7 +28,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
             if (currentUser) {
                 try {
-                    // Immediately sync with the Spring Boot backend[cite: 1]
+                    // Immediately sync with the Spring Boot backend
                     const { data } = await api.getProfile();
                     setProfile(data);
                 } catch (error) {
@@ -49,7 +51,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, profile, loading, signOut }}>
+        // Include setProfile in the Provider value
+        <AuthContext.Provider value={{ user, profile, loading, signOut, setProfile }}>
             {!loading && children}
         </AuthContext.Provider>
     );

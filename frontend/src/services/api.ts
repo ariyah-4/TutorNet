@@ -28,7 +28,7 @@ apiClient.interceptors.request.use(async (config) => {
 export const api = {
     // --- Profile Management ---
     getProfile: () => apiClient.get<Profile>('/profiles/me'),
-    updateProfile: (data: Profile) => apiClient.put<Profile>('/profiles/me', data),
+    updateProfile: (data: Partial<Profile>) => apiClient.put<Profile>('/profiles/me', data),
     becomeTutor: () => apiClient.post<Profile>('/profiles/become-tutor'),
 
     // --- Course Discovery & Management ---
@@ -48,6 +48,9 @@ export const api = {
     deleteLesson: (lessonId: string) => apiClient.delete(`/lessons/${lessonId}`),
     getLesson: (lessonId: string) =>
         apiClient.get<Lesson>(`/lessons/${lessonId}`),
+
+    // --- Enrollments ---
+    getMyEnrollments: () => apiClient.get<Enrollment[]>('/api/enrollments/my-learning'),
 
     // --- Quizzes ---
     createQuiz: (lessonId: string, data: Quiz) => apiClient.post<Quiz>(`/lessons/${lessonId}/quiz`, data),

@@ -15,10 +15,9 @@ import EditLesson from "./pages/EditLesson.tsx";
 import CreateQuiz from "./pages/CreateQuiz.tsx";
 import TakeQuiz from "./pages/TakeQuiz.tsx";
 import SubmitAssignment from './pages/SubmitAssignment';
+import Dashboard from './pages/Dashboard';
+import ProfilePage from './pages/ProfilePage';
 
-// Placeholder Components
-const Dashboard = () => <div>Dashboard - Welcome back!</div>;
-const ProfilePage = () => <div>Profile Settings.</div>;
 
 function App() {
   const { profile, loading } = useAuth();
@@ -69,7 +68,7 @@ function App() {
             </Route>
           </Route>
 
-          {/* 404 Redirect */}
+          {/* 404 Redirects */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
