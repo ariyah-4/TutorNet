@@ -126,7 +126,7 @@ const CourseDetail = () => {
                                     to={`/course/${courseId}/lesson/${lesson.id}`}
                                     className="text-slate-300 hover:text-blue-400 font-black text-[10px] uppercase tracking-widest px-4 py-2 bg-slate-950 rounded-xl border border-slate-800 transition-all"
                                 >
-                                    {isDone ? 'Revisit' : 'Start_Lesson'}
+                                    {isDone ? 'Revisit' : 'Start Lesson'}
                                 </Link>
 
                                 {/* TUTOR MANAGEMENT: Only visible to the assigned Tutor */}
