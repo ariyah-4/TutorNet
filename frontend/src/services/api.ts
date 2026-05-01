@@ -61,7 +61,7 @@ export const api = {
 
     // --- Assignments ---
     getAssignmentByLesson: (lessonId: string) => apiClient.get<Assignment>(`/lessons/${lessonId}/assignment`),
-    createAssignment: (lessonId: string, data: Assignment) =>
+    createAssignment: (lessonId: string, data: Omit<Assignment, 'id' | 'lesson'>) =>
         apiClient.post<Assignment>(`/lessons/${lessonId}/assignment`, data),
     submitAssignment: (lessonId: string, content: string) =>
         apiClient.post(`/assignments/${lessonId}/submit`, { content }),

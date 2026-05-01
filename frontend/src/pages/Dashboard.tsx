@@ -128,7 +128,7 @@ const Dashboard = () => {
                             <div className="p-8 text-center text-slate-600 italic text-sm">No recent updates.</div>
                         ) : (
                             announcements.map((ann) => (
-                                <div key={ann.id} className="p-5 hover:bg-white/5 transition-colors">
+                                <div key={ann.id} className="p-5 hover:bg-slate-950/5 transition-colors">
                                     <div className="flex justify-between items-center mb-2">
                                         <span className="text-[10px] font-bold text-blue-400 uppercase">{ann.course.title}</span>
                                         <span className="text-[10px] text-slate-600">{new Date(ann.createdAt).toLocaleDateString()}</span>

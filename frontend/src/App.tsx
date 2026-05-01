@@ -17,6 +17,7 @@ import TakeQuiz from "./pages/TakeQuiz.tsx";
 import SubmitAssignment from './pages/SubmitAssignment';
 import Dashboard from './pages/Dashboard';
 import ProfilePage from './pages/ProfilePage';
+import AssignmentCreate from './pages/AssignmentCreate';
 
 
 function App() {
@@ -60,6 +61,10 @@ function App() {
               <Route
                   path="/course/:courseId/edit-lesson/:lessonId"
                   element={profile?.role === 'TUTOR' ? <EditLesson /> : <Navigate to="/" />}
+              />
+              <Route
+                  path="/course/:courseId/lesson/:lessonId/create-assignment"
+                  element={profile?.role === 'TUTOR' ? <AssignmentCreate /> : <Navigate to="/" />}
               />
               <Route
                   path="/course/:courseId/lesson/:lessonId/create-quiz"
