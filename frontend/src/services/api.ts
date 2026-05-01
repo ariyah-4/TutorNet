@@ -33,7 +33,7 @@ export const api = {
 
     // --- Course Discovery & Management ---
     getAllCourses: () => apiClient.get<Course[]>('/courses'),
-    createCourse: (data: Course) => apiClient.post<Course>('/courses', data),
+    createCourse: (data: Partial<Course>) => apiClient.post<Course>('/courses', data),
     getMyLearning: () => apiClient.get<Enrollment[]>('/courses/my-learning'),
     getMyCourses: () => apiClient.get<Course[]>('/courses/my-courses'),
     enroll: (courseId: string) => apiClient.post<Enrollment>(`/courses/${courseId}/enroll`),

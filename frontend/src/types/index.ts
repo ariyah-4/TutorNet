@@ -24,7 +24,7 @@ export interface Course {
     description: string;
     price: number;
     imageUrl?: string;
-    difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
+    difficulty: string;
     createdAt: string; // date-time string
     tutor: Profile;
 }
