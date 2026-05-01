@@ -5,6 +5,8 @@ import com.tutornet.model.Enrollment;
 import com.tutornet.model.Profile;
 import com.tutornet.repository.CourseRepository;
 import com.tutornet.repository.EnrollmentRepository;
+import com.tutornet.repository.LessonProgressRepository;
+import com.tutornet.repository.LessonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,12 @@ public class EnrollmentService {
 
     @Autowired
     private CourseRepository courseRepository;
+
+    @Autowired
+    private LessonRepository lessonRepository;
+
+    @Autowired
+    private LessonProgressRepository lessonProgressRepository;
 
     @Autowired
     private ProfileService profileService;
@@ -46,4 +54,5 @@ public class EnrollmentService {
     public List<Enrollment> getLearnerEnrollments(UUID learnerId) {
         return enrollmentRepository.findByLearnerId(learnerId);
     }
+
 }

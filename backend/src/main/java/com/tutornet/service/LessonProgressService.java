@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -51,15 +52,25 @@ public class LessonProgressService {
 
     public Map<String, Object> calculateCourseProgress(UUID learnerId, UUID courseId) {
         long totalLessons = lessonRepository.countByCourseId(courseId);
-        long completedLessons = progressRepository.countByLearnerIdAndLesson_CourseIdAndCompletedTrue(learnerId, courseId);
 
-        double percentage = totalLessons > 0 ? ((double) completedLessons / totalLessons) * 100 : 0;
+        // 1. Fetch the actual records to get the IDs
+        List<LessonProgress> completedRecords = progressRepository.findAllByLearnerIdAndLesson_CourseIdAndCompletedTrue(learnerId, courseId);
+
+        // 2. Extract the Lesson UUIDs from those records
+        List<UUID> completedLessonIds = completedRecords.stream()
+                .map(lp -> lp.getLesson().getId())
+                .toList();
+
+        long completedCount = completedLessonIds.size();
+        double percentage = totalLessons > 0 ? ((double) completedCount / totalLessons) * 100 : 0;
         double roundedPercentage = Math.round(percentage * 100.0) / 100.0;
 
+        // 3. Add "completedLessonIds" to the Map so the frontend can see them
         return Map.of(
-                "completedCount", completedLessons,
+                "completedCount", completedCount,
                 "totalCount", totalLessons,
-                "percentage", roundedPercentage
+                "percentage", roundedPercentage,
+                "completedLessonIds", completedLessonIds
         );
     }
 }
