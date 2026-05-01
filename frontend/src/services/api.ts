@@ -46,6 +46,8 @@ export const api = {
     markLessonIncomplete: (lessonId: string) => apiClient.post<string>(`/lessons/${lessonId}/incomplete`),
     updateLesson: (lessonId: string, data: Partial<Lesson>) => apiClient.put<Lesson>(`/lessons/${lessonId}`, data),
     deleteLesson: (lessonId: string) => apiClient.delete(`/lessons/${lessonId}`),
+    getLesson: (lessonId: string) =>
+        apiClient.get<Lesson>(`/lessons/${lessonId}`),
 
     // --- Quizzes ---
     createQuiz: (lessonId: string, data: Quiz) => apiClient.post<Quiz>(`/lessons/${lessonId}/quiz`, data),
@@ -58,8 +60,12 @@ export const api = {
     getAssignmentByLesson: (lessonId: string) => apiClient.get<Assignment>(`/lessons/${lessonId}/assignment`),
     createAssignment: (lessonId: string, data: Assignment) =>
         apiClient.post<Assignment>(`/lessons/${lessonId}/assignment`, data),
-    submitAssignmentWork: (lessonId: string, work: string) =>
-        apiClient.post<string>(`/assignments/${lessonId}/submit`, work),
+    submitAssignment: (lessonId: string, content: string) =>
+        apiClient.post(`/assignments/${lessonId}/submit`, { content }),
+
+    // --- Submissions ---
+    getMySubmission: (lessonId: string) =>
+        apiClient.get(`/assignments/${lessonId}/my-submission`),
 
     // --- Announcements ---
     getAnnouncements: (courseId: string) => apiClient.get<Announcement[]>(`/courses/${courseId}/announcements`),

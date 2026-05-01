@@ -30,11 +30,14 @@ export interface Course {
 }
 
 export interface Lesson {
-    id: string; // uuid
+    id: string;
     title: string;
     content: string;
     orderIndex: number;
-    course: Course;
+    course?: Course;
+
+    assignment?: Assignment;
+    quiz?: Quiz;
 }
 
 // --- Assessments (Quizzes & Assignments) ---

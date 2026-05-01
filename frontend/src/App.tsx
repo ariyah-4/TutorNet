@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from './context/AuthContext'; // 1. Import your hook
+import { useAuth } from './context/AuthContext';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
@@ -14,16 +14,15 @@ import CreateLesson from "./pages/CreateLesson.tsx";
 import EditLesson from "./pages/EditLesson.tsx";
 import CreateQuiz from "./pages/CreateQuiz.tsx";
 import TakeQuiz from "./pages/TakeQuiz.tsx";
+import SubmitAssignment from './pages/SubmitAssignment';
 
 // Placeholder Components
 const Dashboard = () => <div>Dashboard - Welcome back!</div>;
 const ProfilePage = () => <div>Profile Settings.</div>;
 
 function App() {
-  // 2. Destructure the profile from your auth context
   const { profile, loading } = useAuth();
 
-  // 3. Optional: Wait for the profile to load to avoid flickering redirects
   if (loading) return <div className="bg-slate-950 h-screen" />;
 
   return (
@@ -40,6 +39,17 @@ function App() {
               <Route path="/browse" element={<BrowseCourses />} />
               <Route path="/my-learning" element={<MyLearning />} />
               <Route path="/my-courses" element={<MyCourses />} />
+              <Route path="/profile" element={<ProfilePage />} />
+
+              {/* Course & Content Management */}
+              <Route path="/course/:courseId" element={<CourseDetail />} />
+              <Route path="/course/:courseId/lesson/:lessonId" element={<LessonView />} />
+
+              {/* Assignment & Quiz Interaction */}
+              <Route path="/course/:courseId/lesson/:lessonId/assignment" element={<SubmitAssignment />} />
+              <Route path="/course/:courseId/lesson/:lessonId/quiz" element={<TakeQuiz />} />
+
+              {/* Tutor Specific Routes */}
               <Route
                   path="/create-course"
                   element={profile?.role === 'TUTOR' ? <CourseCreate /> : <Navigate to="/" />}
@@ -56,10 +66,6 @@ function App() {
                   path="/course/:courseId/lesson/:lessonId/create-quiz"
                   element={profile?.role === 'TUTOR' ? <CreateQuiz /> : <Navigate to="/" />}
               />
-              <Route path="/course/:courseId/lesson/:lessonId/quiz" element={<TakeQuiz />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/course/:courseId" element={<CourseDetail />} />
-              <Route path="/course/:courseId/lesson/:lessonId" element={<LessonView />} />
             </Route>
           </Route>
 

@@ -30,6 +30,16 @@ public class Submission {
     @JoinColumn(name = "lesson_id", nullable = false)
     private Lesson lesson;
 
+    // The specific quiz being answered (for "QUIZ" types)
+    @ManyToOne
+    @JoinColumn(name = "quiz_id")
+    private Quiz quiz;
+
+    // The specific assignment being answered
+    @ManyToOne
+    @JoinColumn(name = "assignment_id")
+    private Assignment assignment;
+
     // Type helps us distinguish between the two quickly
     private String type; // "QUIZ" or "ASSIGNMENT"
 

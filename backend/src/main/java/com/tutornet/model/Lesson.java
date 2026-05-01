@@ -2,6 +2,7 @@ package com.tutornet.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,5 +34,13 @@ public class Lesson {
     @JoinColumn(name = "course_id", nullable = false)
     @JsonBackReference // Prevents infinite recursion in JSON
     private Course course;
+
+    @OneToOne(mappedBy = "lesson", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private Assignment assignment;
+
+    @OneToOne(mappedBy = "lesson", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private Quiz quiz;
 
 }

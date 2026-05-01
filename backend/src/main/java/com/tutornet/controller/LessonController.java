@@ -41,12 +41,22 @@ public class LessonController {
 
     // --- GETTERS (Protected by Gatekeeper) ---
 
+    @GetMapping("/{lessonId}")
+    public Lesson getLessonById(@PathVariable UUID lessonId, @AuthenticationPrincipal Jwt jwt) {
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found"));
+
+        // The Gatekeeper Check
+        validateAccess(lesson, jwt);
+
+        return lesson;
+    }
+
     @GetMapping("/{lessonId}/quiz")
     public Quiz getQuizByLesson(@PathVariable UUID lessonId, @AuthenticationPrincipal Jwt jwt) {
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found"));
 
-        // The Gatekeeper Check
         validateAccess(lesson, jwt);
 
         return quizRepository.findByLessonId(lessonId)
@@ -58,7 +68,6 @@ public class LessonController {
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found"));
 
-        // The Gatekeeper Check
         validateAccess(lesson, jwt);
 
         return assignmentRepository.findByLessonId(lessonId)
@@ -74,7 +83,6 @@ public class LessonController {
         return ResponseEntity.ok(updatedLesson);
     }
 
-    // DELETE: DELETE /api/lessons/{lessonId}
     @DeleteMapping("/{lessonId}")
     public ResponseEntity<?> deleteLesson(@PathVariable UUID lessonId) {
         lessonService.deleteLesson(lessonId);
@@ -93,7 +101,6 @@ public class LessonController {
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found"));
 
-        // Security: Ensure the Tutor owns the Course this lesson belongs to
         verifyTutorOwnership(lesson, jwt);
 
         quiz.setLesson(lesson);
@@ -114,7 +121,6 @@ public class LessonController {
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lesson not found"));
 
-        // Security: Ownership check
         verifyTutorOwnership(lesson, jwt);
 
         assignment.setLesson(lesson);
@@ -141,39 +147,28 @@ public class LessonController {
 
     // --- PRIVATE SECURITY HELPERS ---
 
-//    /**
-//     * The "Gatekeeper": Checks if the user (Tutor or Learner)
-//     * has the right to view this lesson's content.
-//     */
-private void validateAccess(Lesson lesson, Jwt jwt) {
-    UUID userId = UUID.fromString(jwt.getSubject());
+    private void validateAccess(Lesson lesson, Jwt jwt) {
+        UUID userId = UUID.fromString(jwt.getSubject());
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-    // Let Spring Security handle the roles!
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isTutor = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().contains("TUTOR"));
 
-    // Check authorities safely, ignoring whether it has a "ROLE_" prefix or not
-    boolean isTutor = auth.getAuthorities().stream()
-            .anyMatch(a -> a.getAuthority().contains("TUTOR"));
+        boolean isLearner = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().contains("LEARNER"));
 
-    boolean isLearner = auth.getAuthorities().stream()
-            .anyMatch(a -> a.getAuthority().contains("LEARNER"));
-
-    if (isTutor) {
-        verifyTutorOwnership(lesson, jwt);
-    } else if (isLearner) {
-        // Suspect #2 lives here!
-        boolean isEnrolled = enrollmentRepository.existsByLearnerIdAndCourseId(userId, lesson.getCourse().getId());
-        if (!isEnrolled) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access Denied: You are not enrolled in this course.");
+        if (isTutor) {
+            verifyTutorOwnership(lesson, jwt);
+        } else if (isLearner) {
+            boolean isEnrolled = enrollmentRepository.existsByLearnerIdAndCourseId(userId, lesson.getCourse().getId());
+            if (!isEnrolled) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access Denied: You are not enrolled in this course.");
+            }
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access Denied: Unrecognized Role.");
         }
-    } else {
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access Denied: Unrecognized Role.");
     }
-}
-//
-//    /**
-//     * Checks if the current Tutor owns the course this lesson belongs to.
-//     */
+
     private void verifyTutorOwnership(Lesson lesson, Jwt jwt) {
         UUID currentTutorId = UUID.fromString(jwt.getSubject());
         if (!lesson.getCourse().getTutor().getId().equals(currentTutorId)) {

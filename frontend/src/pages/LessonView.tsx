@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom'; // Added Link
 import { api } from '../services/api';
 import type { Lesson } from '../types';
 
@@ -25,10 +25,7 @@ const LessonView = () => {
                 setLesson(currentLesson || null);
 
                 // 2. Check Completion Status
-                // We use String() cast to ensure UUIDs from backend match strings from useParams
                 const completedIds: any[] = (progressRes.data as any).completedLessonIds || [];
-
-                console.log("Comparing:", lessonId, "against list:", completedIds);
                 const found = completedIds.some(id => String(id) === String(lessonId));
 
                 setIsCompleted(found);
@@ -74,11 +71,59 @@ const LessonView = () => {
                     <h1 className="text-3xl font-bold text-white">{lesson.title}</h1>
                 </div>
 
-                <div className="p-8 min-h-[400px] text-slate-300 prose prose-invert max-w-none">
-                    <p className="text-lg leading-relaxed whitespace-pre-wrap">{lesson.content}</p>
+                {/* Lesson Body */}
+                <div className="p-8 text-slate-300 prose prose-invert max-w-none">
+                    <p className="text-lg leading-relaxed whitespace-pre-wrap mb-8">{lesson.content}</p>
+
+                    {/* --- ASSIGNMENT SECTION --- */}
+                    {lesson.assignment && (
+                        <div className="not-prose mt-12 p-6 bg-blue-900/20 border border-blue-500/30 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6">
+                            <div className="flex items-start gap-4">
+                                <div className="p-3 bg-blue-600 rounded-lg text-white">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-white">Lesson Assignment</h3>
+                                    <p className="text-slate-400 text-sm">Submit your practical work for review.</p>
+                                </div>
+                            </div>
+                            <Link
+                                to={`/course/${courseId}/lesson/${lessonId}/assignment`}
+                                className="w-full md:w-auto px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all text-center shadow-lg shadow-blue-900/40"
+                            >
+                                Open Assignment
+                            </Link>
+                        </div>
+                    )}
+
+                    {/* --- QUIZ SECTION --- */}
+                    {lesson.quiz && (
+                        <div className="not-prose mt-6 p-6 bg-purple-900/20 border border-purple-500/30 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6">
+                            <div className="flex items-start gap-4">
+                                <div className="p-3 bg-purple-600 rounded-lg text-white">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-white">Lesson Quiz</h3>
+                                    <p className="text-slate-400 text-sm">Test your knowledge of this topic.</p>
+                                </div>
+                            </div>
+                            <Link
+                                to={`/course/${courseId}/lesson/${lessonId}/quiz`}
+                                className="w-full md:w-auto px-8 py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl transition-all text-center shadow-lg shadow-purple-900/40"
+                            >
+                                Take Quiz
+                            </Link>
+                        </div>
+                    )}
                 </div>
 
-                <div className="p-8 bg-slate-900/50 border-t border-slate-800 flex justify-end gap-4">
+                {/* Footer Controls */}
+                <div className="p-8 bg-slate-900/50 border-t border-slate-800 flex flex-col sm:flex-row justify-end gap-4">
                     <button
                         onClick={handleToggleCompletion}
                         disabled={actionLoading}
@@ -91,7 +136,6 @@ const LessonView = () => {
                         {actionLoading ? 'Updating...' : isCompleted ? '✕ Mark as Incomplete' : '✓ Mark as Complete'}
                     </button>
 
-                    {/* Return to Syllabus is always useful for navigation */}
                     <button
                         onClick={() => navigate(`/course/${courseId}`)}
                         className="bg-slate-800 hover:bg-slate-700 text-white px-8 py-3 rounded-xl font-bold transition-all"
